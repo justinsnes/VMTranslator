@@ -12,6 +12,8 @@ print(args.vmfilepath + " is the target file")
 
 asmfilename = pathlib.Path(args.vmfilepath).name.replace(".vm", ".asm")
 
+asmPrinter = AssemblyPrinter()
+
 with open(args.vmfilepath) as vmfile:
     pathlib.Path(asmfilename).unlink(missing_ok=True)
     with open(asmfilename, 'a') as asmfile:
@@ -22,7 +24,7 @@ with open(args.vmfilepath) as vmfile:
 
             asmfile.write("//" + line)
 
-            asmOutput = AssemblyPrinter.TranslateMathLogic(line)
+            asmOutput = asmPrinter.TranslateMathLogic(line)
             for asmLine in asmOutput:
                 asmfile.write(asmLine + "\n")
 
