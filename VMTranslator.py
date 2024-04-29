@@ -24,7 +24,8 @@ with open(args.vmfilepath) as vmfile:
 
             asmfile.write("//" + line)
 
-            asmOutput = asmPrinter.TranslateMathLogic(line)
+            asmOutput = asmPrinter.TranslateVMToAssembly(line)
+
             for asmLine in asmOutput:
                 asmfile.write(asmLine + "\n")
 
