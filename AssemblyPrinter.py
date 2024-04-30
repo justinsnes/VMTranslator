@@ -1,7 +1,8 @@
 class AssemblyPrinter:
     def __init__(self):
         self.jumpCounter = 0
-        self.vmToAsmMemory = {"local":"LCL","argument":"ARG","this":"THIS","that":"THAT","temp":"R5","pointer":"THIS"}
+        self.vmToAsmMemory = {"local":"LCL","argument":"ARG","this":"THIS","that":"THAT",
+                              "temp":"R5","pointer":"THIS","static":"16"}
 
     def incrementStackPointer(self, asmLines):
         asmLines.append("@SP")
@@ -80,7 +81,7 @@ class AssemblyPrinter:
                 asmLines.append("D=A")
             elif (memoryLocation in self.vmToAsmMemory):
                 asmLines.append("@" + self.vmToAsmMemory[memoryLocation])
-                if (memoryLocation in ["temp","pointer"]):
+                if (memoryLocation in ["temp","pointer","static"]):
                     asmLines.append("D=A")
                 else:
                     asmLines.append("D=M")
@@ -97,7 +98,7 @@ class AssemblyPrinter:
 
         if action == "pop":
             asmLines.append("@" + self.vmToAsmMemory[memoryLocation])
-            if (memoryLocation in ["temp","pointer"]):
+            if (memoryLocation in ["temp","pointer","static"]):
                 asmLines.append("D=A")
             else:
                 asmLines.append("D=M")
