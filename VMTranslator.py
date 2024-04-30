@@ -10,7 +10,8 @@ args = parser.parse_args()
 
 print(args.vmfilepath + " is the target file")
 
-asmfilename = pathlib.Path(args.vmfilepath).name.replace(".vm", ".asm")
+#asmfilename = pathlib.Path(args.vmfilepath).name.replace(".vm", ".asm")
+asmfilename = args.vmfilepath.replace(".vm", ".asm")
 
 asmPrinter = AssemblyPrinter()
 
