@@ -114,4 +114,8 @@ class AssemblyPrinter:
             asmLines.append("A=M")
             asmLines.append("M=D")
             
-        
+    def TranslateProgramFlow(self):
+        pass
+
+    def TranslateFunctionLine(self):
+        pass
