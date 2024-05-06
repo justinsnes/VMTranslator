@@ -31,7 +31,6 @@ asmPrinter = AssemblyPrinter()
 pathlib.Path(asmFilename).unlink(missing_ok=True)
 with open(asmFilename, 'a+') as asmfile:
     
-    
     for vmFilename in vmFiles:
         with open(vmFilename) as vmfile:
             

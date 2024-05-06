@@ -10,7 +10,8 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["./TestVMFiles/StaticTest"]
+            //"args": ["~/Desktop/nand2tetris/projects/7/MemoryAccess"]
+            "args": ["~/Desktop/nand2tetris/projects/8/ProgramFlow/BasicLoop"]
         }
     ]
 }

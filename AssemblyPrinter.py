@@ -7,29 +7,36 @@ class AssemblyPrinter:
     def incrementStackPointer(self, asmLines):
         asmLines.append("@SP")
         asmLines.append("M=M+1")
-    
-    def popLastTwoDM(self, asmLines):
+
+    def popStack(self, asmLines):
         asmLines.append("@SP")
         asmLines.append("M=M-1")
         asmLines.append("A=M")
         asmLines.append("D=M")
+    
+    def popLastTwoDM(self, asmLines):
+        self.popStack(asmLines)
         asmLines.append("@SP")
         asmLines.append("M=M-1")
         asmLines.append("A=M")
 
     def TranslateVMToAssembly(self, vmcommand):
-        vmcommand = vmcommand.replace('\n', '').replace('\r', '')
+        vmcommand = vmcommand.replace('\n', '').replace('\r', '').replace('\t', '')
+        vmcommand = vmcommand.strip() # remove leading and trailing whitespace
         asmLines = []
         words = vmcommand.split(" ")
         action = words[0]
 
-        if action in ["push", "pop"]:
+        if action in ["label", "goto", "if-goto"]:
+            labelName = words[1]
+            self.TranslateProgramFlow(asmLines, action, labelName)
+        elif action in ["push", "pop"]:
             memoryLocation = words[1]
             offset = words[2]
             self.TranslateMemoryAccess(asmLines, action, memoryLocation, offset)
         elif action in ["add", "sub", "neg", "not", "eq", "lt", "gt", "and", "or"]:
             self.TranslateMathLogic(asmLines, action)
-
+        
         return asmLines
 
 
@@ -106,16 +113,18 @@ class AssemblyPrinter:
             asmLines.append("D=D+A")
             asmLines.append("@R13")
             asmLines.append("M=D")
-            asmLines.append("@SP")
-            asmLines.append("M=M-1")
-            asmLines.append("A=M")
-            asmLines.append("D=M")
+            self.popStack(asmLines)
             asmLines.append("@R13")
             asmLines.append("A=M")
             asmLines.append("M=D")
             
-    def TranslateProgramFlow(self):
-        pass
+    def TranslateProgramFlow(self, asmLines, flowCommand, labelName):
+        if flowCommand == "label":
+            asmLines.append("(" + labelName + ")")
+        elif flowCommand == "if-goto":
+            self.popStack(asmLines)
+            asmLines.append("@" + labelName)
+            asmLines.append("D;JNE")
 
     def TranslateFunctionLine(self):
         pass
