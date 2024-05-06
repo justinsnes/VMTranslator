@@ -125,6 +125,9 @@ class AssemblyPrinter:
             self.popStack(asmLines)
             asmLines.append("@" + labelName)
             asmLines.append("D;JNE")
+        elif flowCommand == "goto":
+            asmLines.append("@" + labelName)
+            asmLines.append("0;JMP")
 
     def TranslateFunctionLine(self):
         pass
