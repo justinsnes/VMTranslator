@@ -4,6 +4,8 @@ class AssemblyPrinter:
         self.vmToAsmMemory = {"local":"LCL","argument":"ARG","this":"THIS","that":"THAT",
                               "temp":"R5","pointer":"THIS","static":"16"}
 
+    currentFnParamCount = 0
+
     def incrementStackPointer(self, asmLines):
         asmLines.append("@SP")
         asmLines.append("M=M+1")
@@ -30,6 +32,12 @@ class AssemblyPrinter:
         if action in ["label", "goto", "if-goto"]:
             labelName = words[1]
             self.TranslateProgramFlow(asmLines, action, labelName)
+        elif action in ["function", "call"]:
+            functionName = words[1]
+            numParameters = int(words[2])
+            self.TranslateFunctionLine(asmLines, action, functionName, numParameters)
+        elif action == "return":
+            self.TranslateFunctionLine(asmLines, action, "", 0)
         elif action in ["push", "pop"]:
             memoryLocation = words[1]
             offset = words[2]
@@ -129,5 +137,51 @@ class AssemblyPrinter:
             asmLines.append("@" + labelName)
             asmLines.append("0;JMP")
 
-    def TranslateFunctionLine(self):
-        pass
+    def TranslateFunctionLine(self, asmLines, fnCommand, fnName, numParams):
+        if fnCommand == "function":
+            self.currentFnParamCount = numParams
+            asmLines.append("(" + fnName + ")")
+            for param in range(numParams):
+                self.incrementStackPointer(asmLines)
+
+        if fnCommand == "return":
+            #store return value in a register
+            self.popStack(asmLines)
+            asmLines.append("@R13")
+            asmLines.append("M=D")
+            #rewind local variables used
+            for param in range(self.currentFnParamCount):
+                self.popStack(asmLines)
+            #reassign THAT
+            self.popStack(asmLines)
+            asmLines.append("@THAT")
+            asmLines.append("M=D")
+            #reassign THIS
+            self.popStack(asmLines)
+            asmLines.append("@THIS")
+            asmLines.append("M=D")
+            #reassign ARG
+            self.popStack(asmLines)
+            asmLines.append("@ARG")
+            asmLines.append("M=D")
+            #reassign LCL
+            self.popStack(asmLines)
+            asmLines.append("@LCL")
+            asmLines.append("M=D")
+            #store return address in a register
+            self.popStack(asmLines)
+            asmLines.append("@R14")
+            asmLines.append("M=D")
+            #rewind arguments used
+            for param in range(self.currentFnParamCount):
+                self.popStack(asmLines)
+            self.currentFnParamCount = 0
+
+            #place result on callback for stack pointer
+            asmLines.append("@R13")
+            asmLines.append("D=M")
+            asmLines.append("@SP")
+            asmLines.append("A=M")
+            asmLines.append("M=D")
+
+            self.incrementStackPointer(asmLines)
