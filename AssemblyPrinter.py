@@ -38,7 +38,9 @@ class AssemblyPrinter:
         words = vmcommand.split(" ")
         action = words[0]
 
-        if action in ["label", "goto", "if-goto"]:
+        if action == "bootstrap":
+            self.TranslateBootstrap(asmLines)
+        elif action in ["label", "goto", "if-goto"]:
             labelName = words[1]
             self.TranslateProgramFlow(asmLines, action, labelName)
         elif action in ["function", "call"]:
@@ -56,6 +58,14 @@ class AssemblyPrinter:
         
         return asmLines
 
+    def TranslateBootstrap(self, asmLines):
+        # SP=256
+        asmLines.append("@256")
+        asmLines.append("D=A")
+        asmLines.append("@SP")
+        asmLines.append("M=D")
+        # call Sys.init
+        self.TranslateFunctionLine(asmLines, "call", "Sys.init", 0)
 
     def TranslateMathLogic(self, asmLines, action):
         if action in ["add", "sub"]:
@@ -174,7 +184,7 @@ class AssemblyPrinter:
             for param in range(numParams):
                 self.incrementStackPointer(asmLines)
             # set return address
-            asmLines.append("@" + fnName + ".return")
+            asmLines.append("@" + fnName + "$ret." + str(self.asmLineNumber))
             asmLines.append("D=A")
             asmLines.append("@SP")
             asmLines.append("A=M")
@@ -197,7 +207,7 @@ class AssemblyPrinter:
             asmLines.append("@" + fnName)
             asmLines.append("0;JMP")
             # setup the return location
-            asmLines.append("(" + fnName + ".return)")
+            asmLines.append("(" + fnName + "$ret." + str(self.asmLineNumber) + ")")
         elif fnCommand == "return":
             # Return uses R13 for the return value and R14 for the target return address
             #store return value in a register

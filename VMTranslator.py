@@ -31,6 +31,14 @@ asmPrinter = AssemblyPrinter()
 pathlib.Path(asmFilename).unlink(missing_ok=True)
 with open(asmFilename, 'a+') as asmfile:
     
+    # if there are multiple VM files, we need to use Bootstrap Code
+    if len(vmFiles) > 1:
+        asmOutput = asmPrinter.TranslateVMToAssembly("bootstrap")
+        for asmLine in asmOutput:
+            asmfile.write(asmLine + "  // line " + str(asmPrinter.asmLineNumber) + "\n")
+            if (not (asmLine.startswith("(") or asmLine.startswith("//")) ):
+                asmPrinter.asmLineNumber += 1
+
     for vmFilename in vmFiles:
         with open(vmFilename) as vmfile:
             
