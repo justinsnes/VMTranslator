@@ -39,12 +39,15 @@ with open(asmFilename, 'a+') as asmfile:
                 if line.startswith("//") or not line.strip():
                     continue
 
+                asmfile.write("\n")
                 asmfile.write("//" + line)
 
                 asmOutput = asmPrinter.TranslateVMToAssembly(line)
 
                 for asmLine in asmOutput:
-                    asmfile.write(asmLine + "\n")
+                    asmfile.write(asmLine + "  // line " + str(asmPrinter.asmLineNumber) + "\n")
+                    if (not (asmLine.startswith("(") or asmLine.startswith("//")) ):
+                        asmPrinter.asmLineNumber += 1
 
       
 print("End VMTranslator")

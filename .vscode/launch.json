@@ -13,7 +13,8 @@
             //"args": ["~/Desktop/nand2tetris/projects/7/MemoryAccess"]
             //"args": ["~/Desktop/nand2tetris/projects/8/ProgramFlow/BasicLoop"]
             //"args": ["~/Desktop/nand2tetris/projects/8/ProgramFlow/FibonacciSeries"]
-            "args": ["~/Desktop/nand2tetris/projects/8/FunctionCalls/SimpleFunction"]
+            //"args": ["~/Desktop/nand2tetris/projects/8/FunctionCalls/SimpleFunction"]
+            "args": ["~/Desktop/nand2tetris/projects/8/FunctionCalls/NestedCall"]
         }
     ]
 }
