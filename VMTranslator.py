@@ -42,6 +42,8 @@ with open(asmFilename, 'a+') as asmfile:
     for vmFilename in vmFiles:
         with open(vmFilename) as vmfile:
             
+            asmPrinter.currentVmFileClass = pathlib.Path(vmFilename).stem
+
             for line in vmfile:
 
                 if line.startswith("//") or not line.strip():

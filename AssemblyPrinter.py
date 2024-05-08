@@ -1,9 +1,11 @@
 class AssemblyPrinter:
     def __init__(self):
         self.jumpCounter = 0
+        # static: 16 is handled by the assembler. static memory locations are treated as @vmfile.[memoryoffset#] in this VM Translator
         self.vmToAsmMemory = {"local":"LCL","argument":"ARG","this":"THIS","that":"THAT",
-                              "temp":"R5","pointer":"THIS","static":"16"}
+                              "temp":"R5","pointer":"THIS"}
 
+    currentVmFileClass = ""
     currentFnParamCount = 0
     asmLineNumber = 0
 
@@ -113,9 +115,12 @@ class AssemblyPrinter:
             if (memoryLocation == "constant"):
                 asmLines.append("@" + offset)
                 asmLines.append("D=A")
+            elif (memoryLocation == "static"):
+                asmLines.append("@" + self.currentVmFileClass + "." + offset)
+                asmLines.append("D=M")
             elif (memoryLocation in self.vmToAsmMemory):
                 asmLines.append("@" + self.vmToAsmMemory[memoryLocation])
-                if (memoryLocation in ["temp","pointer","static"]):
+                if (memoryLocation in ["temp","pointer"]):
                     asmLines.append("D=A")
                 else:
                     asmLines.append("D=M")
@@ -131,19 +136,24 @@ class AssemblyPrinter:
             self.incrementStackPointer(asmLines)
 
         if action == "pop":
-            asmLines.append("@" + self.vmToAsmMemory[memoryLocation])
-            if (memoryLocation in ["temp","pointer","static"]):
-                asmLines.append("D=A")
+            if (memoryLocation == "static"):
+                self.popStack(asmLines)
+                asmLines.append("@" + self.currentVmFileClass + "." + offset)
+                asmLines.append("M=D")
             else:
-                asmLines.append("D=M")
-            asmLines.append("@" + offset)
-            asmLines.append("D=D+A")
-            asmLines.append("@R13")
-            asmLines.append("M=D")
-            self.popStack(asmLines)
-            asmLines.append("@R13")
-            asmLines.append("A=M")
-            asmLines.append("M=D")
+                asmLines.append("@" + self.vmToAsmMemory[memoryLocation])
+                if (memoryLocation in ["temp","pointer"]):
+                    asmLines.append("D=A")
+                else:
+                    asmLines.append("D=M")
+                asmLines.append("@" + offset)
+                asmLines.append("D=D+A")
+                asmLines.append("@R13")
+                asmLines.append("M=D")
+                self.popStack(asmLines)
+                asmLines.append("@R13")
+                asmLines.append("A=M")
+                asmLines.append("M=D")
             
     def TranslateProgramFlow(self, asmLines, flowCommand, labelName):
         if flowCommand == "label":
