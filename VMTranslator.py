@@ -9,20 +9,22 @@ parser = argparse.ArgumentParser("VMTranslator")
 parser.add_argument("vmfilepath", help="The target VM file/directory to be translated to .asm", type=str)
 args = parser.parse_args()
 
-print(args.vmfilepath + " is the target file/directory")
+# expanduser translates ~ to the exact path it represents. needed on Windows
+targetFilepath = os.path.expanduser(args.vmfilepath)
+print(targetFilepath + " is the target file/directory")
 
 vmFiles = [];
 asmFilename = "";
 
-isVmFolder = os.path.isdir(args.vmfilepath)
+isVmFolder = os.path.isdir(targetFilepath)
 if isVmFolder:
-    for vmFile in os.listdir(args.vmfilepath):
+    for vmFile in os.listdir(targetFilepath):
         if vmFile.endswith(".vm"):
-            vmFiles.append(args.vmfilepath + "/" + vmFile)
-    asmFilename = args.vmfilepath + "/" + os.path.basename(args.vmfilepath) + ".asm"
+            vmFiles.append(targetFilepath + "/" + vmFile)
+    asmFilename = targetFilepath + "/" + os.path.basename(targetFilepath) + ".asm"
 else:
-    vmFiles.append(args.vmfilepath)
-    asmFilename = args.vmfilepath.replace(".vm", ".asm")
+    vmFiles.append(targetFilepath)
+    asmFilename = targetFilepath.replace(".vm", ".asm")
 
 
 asmPrinter = AssemblyPrinter()
